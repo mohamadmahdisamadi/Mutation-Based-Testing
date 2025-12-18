@@ -73,6 +73,64 @@ public class SandboxPaymentGatewayTest {
         assertFalse(gateway.charge(user, 300.0));
     }
 
+    @Test
+    void charge_killsBoundaryMutants_forAmountThresholds() {
+        assertTrue(gateway.charge(validUser(), 200.0));
+        assertTrue(gateway.charge(validUser(), 200.01));
+    }
+
+    @Test
+    void charge_isDeclined_whenRiskScoreIsExactly70() {
+        User user = validUser();
+        assertFalse(gateway.charge(user, 501.0));
+    }
+
+    @Test
+    void charge_killsDecimalPrecisionMutants() {
+        // 2 decimal places should pass
+        assertTrue(gateway.charge(validUser(), 10.45));
+        // 3 decimal places should fail
+        assertFalse(gateway.charge(validUser(), 10.456));
+    }
+
+    @Test
+    void charge_killsBlacklistMutants() {
+        User user = validUser();
+        user.setUemail("user@FRAUD.com");
+        assertFalse(gateway.charge(user, 10.0));
+    }
+
+    @Test
+    void charge_killsBoundaryMutants_onAmountThresholds() {
+        assertTrue(gateway.charge(validUser(), 200.0));
+        assertTrue(gateway.charge(validUser(), 500.0));
+    }
+
+    @Test
+    void charge_killsBoundaryMutants_onMaxLimit() {
+        User verySafeUser = new User();
+        verySafeUser.setUemail("a@b.com"); // Choose an email with a low hash % 20
+        verySafeUser.setUname("Safe User");
+        verySafeUser.setUnumber(12345L);
+        assertDoesNotThrow(() -> gateway.charge(verySafeUser, 1000.0));
+    }
+
+    @Test
+    void charge_killsMutants_inRiskLogic() {
+        User riskyUser = validUser();
+        riskyUser.setUname("");
+        riskyUser.setUnumber(null);
+        assertFalse(gateway.charge(riskyUser, 250.0));
+    }
+
+    @Test
+    void charge_killsMutants_inEmailValidation() {
+        User user = validUser();
+        user.setUemail("test@mail.ru");
+        assertTrue(gateway.charge(user, 100.0));
+        assertFalse(gateway.charge(user, 600.0));
+    }
+
 
 
 
