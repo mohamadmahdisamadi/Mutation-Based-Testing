@@ -106,10 +106,15 @@
                         <param>com.example.demo.features.user.service.SimplePantryInventory</param>
                         <param>com.example.demo.features.user.service.PantryItem</param>
                         <param>com.example.demo.features.user.service.NutritionBasedCalorieEstimator</param>
+						<param>com.example.demo.features.order.service.OrderCheckoutService</param>
+						<param>com.example.demo.features.order.service.OrderServices</param>
+						<param>com.example.demo.features.order.service.SandboxPaymentGateway</param>
+						<param>com.example.demo.features.order.service.LoggingConfirmationSender</param>
                     </targetClasses>
 
                     <targetTests>
-                        <param>com.example.demo.features.user.service.*Test</param>
+						<param>com.example.demo.features.user.service.*Test</param>
+						<param>com.example.demo.features.order.service.*Test</param>
                     </targetTests>
 
                     <outputFormats>
