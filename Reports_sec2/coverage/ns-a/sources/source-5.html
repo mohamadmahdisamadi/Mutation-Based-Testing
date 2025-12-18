@@ -1,0 +1,241 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SandboxPaymentGateway</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.example.demo.features.order.service</a>
+</div>
+
+<h1>Coverage Summary for Class: SandboxPaymentGateway (com.example.demo.features.order.service)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SandboxPaymentGateway</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.example.demo.features.order.service;
+&nbsp;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import org.springframework.context.annotation.Profile;
+&nbsp;import org.springframework.stereotype.Component;
+&nbsp;
+&nbsp;import com.example.demo.features.user.model.User;
+&nbsp;
+&nbsp;@Component
+&nbsp;@Profile(&quot;!prod&quot;)
+<b class="nc">&nbsp;public class SandboxPaymentGateway implements PaymentGateway {</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Logger log = LoggerFactory.getLogger(SandboxPaymentGateway.class);</b>
+&nbsp;	private static final double MAX_ALLOWED_AMOUNT = 1_000.0;
+<b class="nc">&nbsp;	private static final Pattern EMAIL_PATTERN = Pattern.compile(&quot;^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$&quot;);</b>
+<b class="nc">&nbsp;	private static final Set&lt;String&gt; BLACKLISTED_EMAIL_DOMAINS = Set.of(&quot;fraud.com&quot;, &quot;test-spam.org&quot;);</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public boolean charge(User user, double amount) {
+<b class="nc">&nbsp;		if (user == null) {</b>
+<b class="nc">&nbsp;			log.warn(&quot;Sandbox payment declined: user details missing for amount {}&quot;, amount);</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		if (amount &lt;= 0) {</b>
+<b class="nc">&nbsp;			log.warn(&quot;Sandbox payment declined for {}: non-positive amount {}&quot;, safeEmail(user), amount);</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		if (hasTooManyDecimalPlaces(amount)) {</b>
+<b class="nc">&nbsp;			log.warn(&quot;Sandbox payment declined for {}: invalid amount precision {}&quot;, safeEmail(user), amount);</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		if (amount &gt; MAX_ALLOWED_AMOUNT) {</b>
+<b class="nc">&nbsp;			log.warn(&quot;Sandbox payment declined for {}: amount {} exceeds sandbox limit {}&quot;, safeEmail(user), amount,</b>
+<b class="nc">&nbsp;					MAX_ALLOWED_AMOUNT);</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		if (!hasValidEmail(user)) {</b>
+<b class="nc">&nbsp;			log.warn(&quot;Sandbox payment declined: invalid email for user {}&quot;, safeEmail(user));</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		if (isBlacklistedDomain(user)) {</b>
+<b class="nc">&nbsp;			log.warn(&quot;Sandbox payment declined for {}: blacklisted email domain&quot;, safeEmail(user));</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		int riskScore = calculateRiskScore(user, amount);</b>
+<b class="nc">&nbsp;		boolean accepted = riskScore &lt; 70;</b>
+&nbsp;
+<b class="nc">&nbsp;		if (accepted) {</b>
+<b class="nc">&nbsp;			log.info(&quot;Sandbox payment accepted for {}: amount {}, risk score {}&quot;, safeEmail(user), amount, riskScore);</b>
+&nbsp;		} else {
+<b class="nc">&nbsp;			log.warn(&quot;Sandbox payment declined for {}: amount {}, risk score {}&quot;, safeEmail(user), amount, riskScore);</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		return accepted;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private int calculateRiskScore(User user, double amount) {
+<b class="nc">&nbsp;		int score = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;		if (amount &gt; 200) {</b>
+<b class="nc">&nbsp;			score += 30;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (amount &gt; 500) {</b>
+<b class="nc">&nbsp;			score += 30;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		if (amount &gt; 800) {</b>
+<b class="nc">&nbsp;			score += 15;</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		if (user.getUnumber() == null) {</b>
+<b class="nc">&nbsp;			score += 20;</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		if (user.getUname() == null || user.getUname().trim().isEmpty()) {</b>
+<b class="nc">&nbsp;			score += 10;</b>
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		String email = user.getUemail();</b>
+<b class="nc">&nbsp;		if (email != null) {</b>
+<b class="nc">&nbsp;			int hash = email.toLowerCase(Locale.ROOT).hashCode();</b>
+<b class="nc">&nbsp;			int positiveHash = hash == Integer.MIN_VALUE ? 0 : Math.abs(hash);</b>
+<b class="nc">&nbsp;			score += positiveHash % 20;</b>
+<b class="nc">&nbsp;			if (email.endsWith(&quot;.ru&quot;) || email.endsWith(&quot;.cn&quot;)) {</b>
+<b class="nc">&nbsp;				score += 20;</b>
+&nbsp;			}
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		return score;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean hasValidEmail(User user) {
+<b class="nc">&nbsp;		String email = user.getUemail();</b>
+<b class="nc">&nbsp;		return email != null &amp;&amp; EMAIL_PATTERN.matcher(email).matches();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String safeEmail(User user) {
+<b class="nc">&nbsp;		return user.getUemail() != null ? user.getUemail() : &quot;unknown&quot;;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean isBlacklistedDomain(User user) {
+<b class="nc">&nbsp;		String email = user.getUemail();</b>
+<b class="nc">&nbsp;		if (email == null || !email.contains(&quot;@&quot;)) {</b>
+<b class="nc">&nbsp;			return false;</b>
+&nbsp;		}
+<b class="nc">&nbsp;		String domain = email.substring(email.indexOf(&#39;@&#39;) + 1).toLowerCase(Locale.ROOT);</b>
+<b class="nc">&nbsp;		return BLACKLISTED_EMAIL_DOMAINS.contains(domain);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean hasTooManyDecimalPlaces(double amount) {
+<b class="nc">&nbsp;		BigDecimal value = BigDecimal.valueOf(amount);</b>
+<b class="nc">&nbsp;		return value.scale() &gt; 2;</b>
+&nbsp;	}
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-12-18 03:21</div>
+</div>
+</body>
+</html>

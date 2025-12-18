@@ -1,0 +1,183 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UserServices</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.example.demo.features.user.service</a>
+</div>
+
+<h1>Coverage Summary for Class: UserServices (com.example.demo.features.user.service)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserServices</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.example.demo.features.user.service;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.stereotype.Component;
+&nbsp;
+&nbsp;import com.example.demo.features.user.model.User;
+&nbsp;import com.example.demo.features.user.repository.UserRepository;
+&nbsp;
+&nbsp;@Component
+<b class="nc">&nbsp;public class UserServices </b>
+&nbsp;{
+&nbsp;	@Autowired
+&nbsp;	private UserRepository userRepository;
+&nbsp;
+&nbsp;	public List&lt;User&gt; getAllUser()
+&nbsp;	{
+<b class="nc">&nbsp;		List&lt;User&gt; users = (List&lt;User&gt;) this.userRepository.findAll();</b>
+<b class="nc">&nbsp;		return users;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public User getUser(int id)
+&nbsp;	{
+<b class="nc">&nbsp;		Optional&lt;User&gt; optional = this.userRepository.findById(id);</b>
+<b class="nc">&nbsp;		User user = optional.get();</b>
+<b class="nc">&nbsp;		return user;</b>
+&nbsp;	}
+&nbsp;	public User getUserByEmail(String email)
+&nbsp;	{
+<b class="nc">&nbsp;	 User user=	this.userRepository.findUserByUemail(email);</b>
+<b class="nc">&nbsp;	 return user;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void updateUser(User user,int id)
+&nbsp;	{
+<b class="nc">&nbsp;		user.setU_id(id);</b>
+<b class="nc">&nbsp;		 this.userRepository.save(user);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void deleteUser(int id)
+&nbsp;	{
+<b class="nc">&nbsp;		this.userRepository.deleteById(id);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public void addUser(User user)
+&nbsp;	{
+<b class="nc">&nbsp;	this.userRepository.save(user);</b>
+&nbsp;	}
+&nbsp;	
+&nbsp;	public boolean validateLoginCredentials(String email,String password)
+&nbsp;	{
+<b class="nc">&nbsp;		List&lt;User&gt; users = (List&lt;User&gt;) this.userRepository.findAll();</b>
+<b class="nc">&nbsp;		for(User u:users)</b>
+&nbsp;		{
+<b class="nc">&nbsp;		if(u!=null &amp;&amp; u.getUpassword().equals(password) &amp;&amp; u.getUemail().equals(email))</b>
+&nbsp;		{
+<b class="nc">&nbsp;			return true;</b>
+&nbsp;		}
+&nbsp;		}
+<b class="nc">&nbsp;		return false;</b>
+&nbsp;	}
+&nbsp;	
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-12-18 03:21</div>
+</div>
+</body>
+</html>

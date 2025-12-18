@@ -1,0 +1,265 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MealPlanService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.example.demo.features.user.service</a>
+</div>
+
+<h1>Coverage Summary for Class: MealPlanService (com.example.demo.features.user.service)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MealPlanService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.2%
+  </span>
+  <span class="absValue">
+    (25/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (43/43)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MealPlanService$ProductScore</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.2%
+  </span>
+  <span class="absValue">
+    (25/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (47/47)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.example.demo.features.user.service;
+&nbsp;
+&nbsp;import java.time.DayOfWeek;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.EnumMap;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.stereotype.Component;
+&nbsp;
+&nbsp;import com.example.demo.features.product.model.Product;
+&nbsp;import com.example.demo.features.product.service.ProductServices;
+&nbsp;
+&nbsp;@Component
+&nbsp;public class MealPlanService {
+&nbsp;
+&nbsp;	private static final int MAX_OCCURRENCES_PER_PRODUCT_PER_WEEK = 3;
+&nbsp;
+&nbsp;	private final ProductServices productServices;
+&nbsp;	private final CalorieEstimator calorieEstimator;
+&nbsp;	private final PantryInventory pantryInventory;
+&nbsp;
+&nbsp;	@Autowired
+&nbsp;	public MealPlanService(ProductServices productServices, CalorieEstimator calorieEstimator,
+<b class="fc">&nbsp;			PantryInventory pantryInventory) {</b>
+<b class="fc">&nbsp;		this.productServices = productServices;</b>
+<b class="fc">&nbsp;		this.calorieEstimator = calorieEstimator;</b>
+<b class="fc">&nbsp;		this.pantryInventory = pantryInventory;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	public MealPlan generateWeeklyPlan(double dailyCalorieTarget, int mealsPerDay) {
+<b class="fc">&nbsp;		if (dailyCalorieTarget &lt;= 0) {</b>
+<b class="fc">&nbsp;			throw new IllegalArgumentException(&quot;Daily calorie target must be positive&quot;);</b>
+&nbsp;		}
+<b class="fc">&nbsp;		if (mealsPerDay &lt;= 0) {</b>
+<b class="fc">&nbsp;			throw new IllegalArgumentException(&quot;Meals per day must be positive&quot;);</b>
+&nbsp;		}
+<b class="fc">&nbsp;		List&lt;Product&gt; products = productServices.getAllProducts();</b>
+<b class="fc">&nbsp;		if (products == null || products.isEmpty()) {</b>
+<b class="fc">&nbsp;			throw new IllegalStateException(&quot;No products available for planning&quot;);</b>
+&nbsp;		}
+<b class="fc">&nbsp;		double targetPerMeal = dailyCalorieTarget / mealsPerDay;</b>
+<b class="fc">&nbsp;		List&lt;ProductScore&gt; scoredProducts = scoreProducts(products, targetPerMeal);</b>
+<b class="fc">&nbsp;		Map&lt;DayOfWeek, List&lt;MealEntry&gt;&gt; plan = new EnumMap&lt;&gt;(DayOfWeek.class);</b>
+<b class="fc">&nbsp;		Map&lt;Integer, Integer&gt; weeklyUsage = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;		for (DayOfWeek day : DayOfWeek.values()) {</b>
+<b class="fc">&nbsp;			List&lt;MealEntry&gt; dayMeals = selectMealsForDay(scoredProducts, mealsPerDay, weeklyUsage);</b>
+<b class="fc">&nbsp;			if (dayMeals.size() &lt; mealsPerDay) {</b>
+<b class="fc">&nbsp;				throw new IllegalStateException(&quot;Unable to fulfill meal plan due to limited inventory&quot;);</b>
+&nbsp;			}
+<b class="fc">&nbsp;			plan.put(day, dayMeals);</b>
+&nbsp;		}
+<b class="fc">&nbsp;		return new MealPlan(plan);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;MealEntry&gt; selectMealsForDay(List&lt;ProductScore&gt; scoredProducts, int mealsPerDay,
+&nbsp;			Map&lt;Integer, Integer&gt; weeklyUsage) {
+<b class="fc">&nbsp;		List&lt;MealEntry&gt; dayMeals = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;		for (ProductScore productScore : scoredProducts) {</b>
+<b class="fc">&nbsp;			Product product = productScore.product;</b>
+<b class="fc">&nbsp;			if (!pantryInventory.hasIngredients(product)) {</b>
+&nbsp;				continue;
+&nbsp;			}
+<b class="fc">&nbsp;			if (hasExceededWeeklyUsage(product, weeklyUsage)) {</b>
+&nbsp;				continue;
+&nbsp;			}
+<b class="fc">&nbsp;			pantryInventory.reserve(product);</b>
+<b class="fc">&nbsp;			dayMeals.add(new MealEntry(product.getPid(), product.getPname(), productScore.estimatedCalories));</b>
+<b class="fc">&nbsp;			incrementUsage(product, weeklyUsage);</b>
+<b class="fc">&nbsp;			if (dayMeals.size() == mealsPerDay) {</b>
+&nbsp;				break;
+&nbsp;			}
+&nbsp;		}
+<b class="fc">&nbsp;		return dayMeals;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean hasExceededWeeklyUsage(Product product, Map&lt;Integer, Integer&gt; weeklyUsage) {
+<b class="fc">&nbsp;		int current = weeklyUsage.getOrDefault(product.getPid(), 0);</b>
+<b class="fc">&nbsp;		return current &gt;= MAX_OCCURRENCES_PER_PRODUCT_PER_WEEK;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private void incrementUsage(Product product, Map&lt;Integer, Integer&gt; weeklyUsage) {
+<b class="fc">&nbsp;		int current = weeklyUsage.getOrDefault(product.getPid(), 0);</b>
+<b class="fc">&nbsp;		weeklyUsage.put(product.getPid(), current + 1);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private List&lt;ProductScore&gt; scoreProducts(List&lt;Product&gt; products, double targetPerMeal) {
+<b class="fc">&nbsp;		List&lt;ProductScore&gt; scored = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;		for (Product product : products) {</b>
+<b class="pc">&nbsp;			if (Objects.isNull(product)) {</b>
+&nbsp;				continue;
+&nbsp;			}
+<b class="fc">&nbsp;			double calories = calorieEstimator.estimateCalories(product);</b>
+<b class="fc">&nbsp;			double score = Math.abs(targetPerMeal - calories);</b>
+<b class="fc">&nbsp;			scored.add(new ProductScore(product, calories, score));</b>
+&nbsp;		}
+<b class="fc">&nbsp;		scored.sort((a, b) -&gt; Double.compare(a.score, b.score));</b>
+<b class="fc">&nbsp;		return scored;</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private static final class ProductScore {
+&nbsp;		private final Product product;
+&nbsp;		private final double estimatedCalories;
+&nbsp;		private final double score;
+&nbsp;
+<b class="fc">&nbsp;		private ProductScore(Product product, double estimatedCalories, double score) {</b>
+<b class="fc">&nbsp;			this.product = product;</b>
+<b class="fc">&nbsp;			this.estimatedCalories = estimatedCalories;</b>
+<b class="fc">&nbsp;			this.score = score;</b>
+&nbsp;		}
+&nbsp;	}
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-12-18 03:21</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,163 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LoggingConfirmationSender</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.example.demo.features.order.service</a>
+</div>
+
+<h1>Coverage Summary for Class: LoggingConfirmationSender (com.example.demo.features.order.service)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LoggingConfirmationSender</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.example.demo.features.order.service;
+&nbsp;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import org.springframework.context.annotation.Profile;
+&nbsp;import org.springframework.stereotype.Component;
+&nbsp;
+&nbsp;import com.example.demo.features.user.model.User;
+&nbsp;
+&nbsp;@Component
+&nbsp;@Profile(&quot;!prod&quot;)
+<b class="nc">&nbsp;public class LoggingConfirmationSender implements ConfirmationSender {</b>
+&nbsp;
+<b class="nc">&nbsp;	private static final Logger log = LoggerFactory.getLogger(LoggingConfirmationSender.class);</b>
+<b class="nc">&nbsp;	private static final Pattern EMAIL_PATTERN = Pattern.compile(&quot;^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$&quot;);</b>
+&nbsp;
+&nbsp;	@Override
+&nbsp;	public void sendConfirmation(User user, double amount) {
+<b class="nc">&nbsp;		if (user == null) {</b>
+<b class="nc">&nbsp;			log.warn(&quot;Skipped confirmation: user details missing for amount {}&quot;, amount);</b>
+&nbsp;			return;
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		if (amount &lt;= 0) {</b>
+<b class="nc">&nbsp;			log.warn(&quot;Skipped confirmation for {}: non-positive amount {}&quot;, safeEmail(user), amount);</b>
+&nbsp;			return;
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		if (!hasValidEmail(user)) {</b>
+<b class="nc">&nbsp;			log.warn(&quot;Skipped confirmation: invalid email for user {}&quot;, safeEmail(user));</b>
+&nbsp;			return;
+&nbsp;		}
+&nbsp;
+<b class="nc">&nbsp;		log.info(&quot;Checkout confirmation queued for {} for {}&quot;, safeEmail(user), amount);</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private boolean hasValidEmail(User user) {
+<b class="nc">&nbsp;		String email = user.getUemail();</b>
+<b class="nc">&nbsp;		return email != null &amp;&amp; EMAIL_PATTERN.matcher(email).matches();</b>
+&nbsp;	}
+&nbsp;
+&nbsp;	private String safeEmail(User user) {
+<b class="nc">&nbsp;		return user.getUemail() != null ? user.getUemail() : &quot;unknown&quot;;</b>
+&nbsp;	}
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-12-18 03:21</div>
+</div>
+</body>
+</html>
